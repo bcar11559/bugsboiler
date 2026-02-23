@@ -1,7 +1,13 @@
 import logging
 from applibs.exceptions import LoggingError
 
+from thirdpartylibs.rotating_file_handler import RotatingLogFileHandler
+
 class ApplicationLogger():
+    """
+    Application Level Logger.
+    Only one logger is allowed per application. An exception is raised if an attempt is made to create a second logger.
+    """
 
     logger = None
 
@@ -15,7 +21,7 @@ class ApplicationLogger():
             name="devicelog"
                 ):
 
-        if self.logger:
+        if self.logger is not None:
             raise LoggingError("Only one Application Logger is allowed!")
         else:
             self.name = name
@@ -26,7 +32,8 @@ class ApplicationLogger():
             stream_handler = logging.StreamHandler()
             stream_handler.setLevel(stream_level)
 
-            file_handler = logging.FileHandler(log_file, mode="a")
+            #file_handler = logging.FileHandler(log_file, mode="a")
+            file_handler = RotatingLogFileHandler(log_file, 333333, 3)
             file_handler.setLevel(file_level)
 
             formatter = logging.Formatter(log_format)

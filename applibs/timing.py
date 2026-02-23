@@ -6,47 +6,52 @@ import ntptime
 from machine import RTC
 from micropython import const
 
-#_ISO_FORMAT_STRING = const("{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}.{:03d}Z")
+_TS_FORMAT = const("{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}.{:03d}Z")
 
 rtc = RTC()
 
-def set_clock(ntpserver='svl1.ntp.se', ntptimeout=3):
+def set_clock(ntpserver='svl1.ntp.se', ntptimeout=5):
     '''
     Set the board RTC with the NTP time.
     '''
-    ntptime.host = ntpserver
-    ntptime.timeout = ntptimeout
-    ntptime.settime()
-    #logger.debug(f"RTC set to {isotime()} from {ntpserver}")
-    tt = time.time()
-    #t = time.strftime("%Y-%m-%d %H:%M:%S", tt)
-    logger.debug(f"RTC set to {tt} from {ntpserver}")
+    try:
+        ntptime.host = ntpserver
+        ntptime.timeout = ntptimeout
+        ntptime.settime()
+        logger.debug(f"RTC set to {timestamp()} from {ntpserver}")
+    except OSError as e:
+        if 'ETIMEDOUT' in str(e):
+            logger.exception(f"RTC set time from {ntpserver} failed due to timeout.")
+        else:
+            logger.exception(f"RTC set time from {ntpserver} failed.")
 
-# def isotime(time_secs=None):
-#     if time_secs is None:
-#         if rtc is None:
-#             return isotime(time.time())
 
-#         # (year, month, day, weekday, hours, minutes, seconds, subseconds)
-#         time_tuple = rtc.datetime()
-#         return _ISO_FORMAT_STRING.format(
-#             time_tuple[0],
-#             time_tuple[1],
-#             time_tuple[2],
-#             time_tuple[4],
-#             time_tuple[5],
-#             time_tuple[6],
-#             int(time_tuple[7] / 1000),
-#         )
-#     else:
-#         # (year, month, mday, hour, minute, second, weekday, yearday)
-#         time_tuple = time.localtime(time_secs)
-#         return _ISO_FORMAT_STRING.format(
-#             time_tuple[0],
-#             time_tuple[1],
-#             time_tuple[2],
-#             time_tuple[3],
-#             time_tuple[4],
-#             time_tuple[5],
-#             0,
-#         )
+def timestamp(time_secs=None):
+    """Format the time as a formatted string timestamp."""
+    if time_secs is None:
+        if rtc is None:
+            return time.time()  
+        else:
+            # (year, month, day, weekday, hours, minutes, seconds, microseconds)
+            time_tuple = rtc.datetime()
+            return _TS_FORMAT.format(
+                time_tuple[0],
+                time_tuple[1],
+                time_tuple[2],
+                time_tuple[4],
+                time_tuple[5],
+                time_tuple[6],
+                time_tuple[7],
+            )
+    else:
+        # (year, month, mday, hour, minute, second, weekday, yearday)
+        time_tuple = time.localtime(time_secs)
+        return _TS_FORMAT.format(
+            time_tuple[0],
+            time_tuple[1],
+            time_tuple[2],
+            time_tuple[3],
+            time_tuple[4],
+            time_tuple[5],
+            0,
+        )

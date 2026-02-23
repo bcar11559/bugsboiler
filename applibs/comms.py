@@ -28,6 +28,13 @@ def reconnect_mqtt(client):
     client.reconnect()
 
 def initialise_wifi(host=f'esp32-{CLIENT_ID.decode()}', reconnects=-1):
+    """
+    Enable the station WiFi interface.
+    
+    :param host: The hostname.
+    :param reconnects: Maximum number of reconnects allowed. See wlan.config().
+    :return: The network interface object
+    """
     wlan = network.WLAN(network.STA_IF)
     network.hostname(host)
     wlan.active(True)
@@ -36,6 +43,13 @@ def initialise_wifi(host=f'esp32-{CLIENT_ID.decode()}', reconnects=-1):
     return wlan
 
 def connect_wifi(wlan):
+    """
+    Connect to an available WiFi.
+    
+    :param wlan: The network interface object.
+    :return: Description
+    :rtype: Connection sucess.
+    """
     logger.info(f'Trying to connect to WiFi SSID: {cfg.ssid}')
     wlan.connect(cfg.ssid, cfg.password)
     time.sleep(1)

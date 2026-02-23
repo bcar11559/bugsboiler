@@ -1,5 +1,6 @@
 from applibs.logger import ApplicationLogger
 logger = ApplicationLogger.logger
+import random
 
 import time
 
@@ -9,15 +10,24 @@ led_pin = Pin(8, Pin.OUT)
 np = NeoPixel(led_pin, 1)
 
 def maintest_rgb_blink():
+
     np[0] = (255,0,0)
     np.write()
-    time.sleep(1)
+    time.sleep_ms(1)
     np[0] = (0,255,0)
     np.write()
-    time.sleep(1)
+    time.sleep_ms(1)
     np[0] = (0,0,255)
     np.write()
     time.sleep(1)
+
+def maintest_rgb_random():
+
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    np[0] = (r,g,b)
+    np.write()
 
 def maintest_20s_fallout():
     for i in range(20):

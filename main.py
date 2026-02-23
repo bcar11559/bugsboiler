@@ -3,13 +3,13 @@ ApplicationLogger()
 logger = ApplicationLogger.logger
 
 from micropython import const
-
+ 
 import time, machine
 
 from applibs.comms import initialise_wifi, connect_wifi, wifi_connected, wan_ok
-from applibs.timing import set_clock
+from applibs.timing import set_clock, timestamp
 from applibs.sysutils import get_platform
-from applibs.mainloop import maintest_rgb_blink
+from applibs.mainloop import maintest_rgb_blink, maintest_rgb_random
 
 VERSION = const("dev0.0.2")
  
@@ -28,7 +28,9 @@ try:
     logger.info(f'Entering main loop now...')
 
     while True:
-        maintest_rgb_blink()
+        maintest_rgb_random()
+        time.sleep_ms(100)
+        logger.debug(f"The time now is {timestamp()}..........................................................................................................................")
 
 except Exception as e:
     logger.exception("Exception raised when running mainloop.")
